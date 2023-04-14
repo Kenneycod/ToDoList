@@ -22,13 +22,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/TodoListDB')
 app.get('/',(req,res)=>{
 
     let currentday = date();
-
-    res.render('list',{listTitle:currentday,newitem:items});
+    list.list.find().then((items)=>{
+        res.render('list',{listTitle:currentday,newitem:items});
+    }).catch(err => console.log(err));
 })
 
 app.post('/',(req,res)=>{
-    console.log(req.body);
-    const item = req.body.newitem;
 
     if (item === '') {
         console.log('cannot add empty strings');
@@ -61,17 +60,38 @@ app.post('/',(req,res)=>{
 
 app.get('/work',(req,res)=>{
 
-    list.list.find().then((workitem)=>{
+    list.Worklist.find().then((workitem)=>{     //geting data from mongodb and displaying on html page
         res.render('list',{listTitle: 'work list',newitem:workitem})
     }).catch(err => console.log(err));
 })
 
 app.post('/work',(req,res)=>{
 
-    let item = req.body.newitem;
-
-    workitem.push(item);
+    const workList = new list.Worklist({
+        'item':item,
+    });
+    workList.save().then((err)=>{
+        console.log('item inserted successfully!')
+        res.redirect('/work');
+    }).catch(err => console.log(err));
     res.redirect('/work');
+})
+
+app.post('/delete',(req,res)=>{
+    const checked = req.body.checkbox;
+    console.log(checked);
+
+    if ({listTitle:'work list'}) {
+        list.Worklist.findByIdAndRemove(checked).then(()=>{
+            console.log("successfully deleted......");
+            res.redirect('/work');
+        }).catch(err => console.log(err));
+    } else {
+        list.list.findByIdAndRemove(checked).then(()=>{
+            console.log("successfully deleted .......")
+            res.redirect('/');
+        }).catch(err => console.log(err));
+    }
 })
 
 app.listen(5500,(err)=>{
