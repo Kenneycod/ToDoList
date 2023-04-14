@@ -8,4 +8,10 @@ const ListSchema = new schema({
 
 const list = mongoose.model('list',ListSchema);
 
-module.exports = list;
+const WorkSchema = new schema({
+    item:String
+})
+
+const Worklist = mongoose.model('worklist',WorkSchema);
+
+module.exports = {list,Worklist};

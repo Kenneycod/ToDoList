@@ -11,9 +11,6 @@ app.use(bodyparser.json());
 mongoose.set('strict',false);
 app.set("view engine","ejs");
 
-let items =['pasta','chicken','rice'];
-let workitem = [];
-
 //connecting to mongodb
 mongoose.connect('mongodb://127.0.0.1:27017/TodoListDB')
 .then(()=>{
@@ -38,27 +35,35 @@ app.post('/',(req,res)=>{
         res.redirect('/');
     } else {
         if (req.body.list === 'work list') {
-            workitem.push(item);
 
-            //adding to item to mongodb
-            const newlist = new list({
+            //adding to worklist database on mongodb
+            const workList = new list.Worklist({
                 'item':item,
             });
-            newlist.save().then((err)=>{
+            workList.save().then((err)=>{
                 console.log('item inserted successfully!')
                 res.redirect('/work');
             }).catch(err => console.log(err));
 
         } else {
-            items.push(item);   
-            res.redirect('/');
+           //adding to list database on mongodb
+            const newlist = new list.list({
+                'item':item,
+            });
+
+            newlist.save().then((err)=>{
+                console.log('item inserted successfully.....')
+                res.redirect('/');
+            }).catch(err => console.log(err));
         }
     }
-    console.log(items);
 })
 
 app.get('/work',(req,res)=>{
-    res.render('list',{listTitle: 'work list',newitem:workitem})
+
+    list.list.find().then((workitem)=>{
+        res.render('list',{listTitle: 'work list',newitem:workitem})
+    }).catch(err => console.log(err));
 })
 
 app.post('/work',(req,res)=>{
