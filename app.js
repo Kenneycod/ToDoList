@@ -29,6 +29,7 @@ app.get('/',(req,res)=>{
 
 app.post('/',(req,res)=>{
 
+    const item = req.body.newitem;
     if (item === '') {
         console.log('cannot add empty strings');
         res.redirect('/');
